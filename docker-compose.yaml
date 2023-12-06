@@ -1,0 +1,46 @@
+version: "1"
+
+services:
+  database:
+    image: database_todo    # should be in docker images
+    container_name: database
+    environment:
+      POSTGRES_DB: docker_app_db
+      POSTGRES_USER: docker_app
+      POSTGRES_PASSWORD: docker_app
+    volumes:
+      - volume_todo:/var/lib/postgresql/data
+    networks:
+      - back_net
+
+  backend:
+    image: backend_todo
+    container_name: backend
+    environment:
+      HOST: database
+      PORT: 5432
+      DB: docker_app_db
+      DB_USERNAME: docker_app
+      DB_PASSWORD: docker_app
+    networks:
+      - back_net
+
+  nginx:
+    image: nginx_todo
+    container_name: frontend
+    networks:
+      - back_net
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+
+volumes:
+  volume_todo:
+    name: volume_todo
+
+networks:
+  back_net:
+    name: back_net
+
+
